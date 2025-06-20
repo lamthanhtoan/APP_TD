@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Tính Toàn Đạc - Lâm Thanh Toàn</title>
+  <style>
+    body { font-family: Arial; background: #f4f4f4; max-width: 600px; margin: auto; padding: 20px; }
+    h2 { color: #007bff; }
+    select, input { width: 100%; padding: 8px; margin: 5px 0; border-radius: 4px; border: 1px solid #ccc; }
+    button { width: 100%; padding: 12px; margin-top: 10px; background: #007bff; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+    button:hover { background: #0056b3; }
+    .block { background: #fff; padding: 15px; margin-top: 15px; border-radius: 8px; box-shadow: 0 2px 4px #ccc; }
+    .result { margin-top: 10px; padding: 10px; background: #eef; border-left: 4px solid #007bff; }
+    .note { font-size: 0.9em; color: #555; margin-top: 8px; background: #f9f9f9; padding: 8px; border-left: 3px solid #999; }
+  </style>
+</head>
+<body>
+
+  <h2>Công cụ tính - Lâm Thanh Toàn</h2>
+
+  <label>Chọn chức năng:</label>
+  <select id="chucnang" onchange="chonChucNang()">
+    <option value="">-- Chọn --</option>
+    <option value="2c">Tính 2C</option>
+    <option value="kc">Tính khoảng cách 2 điểm</option>
+    <option value="ss">Tính sai số vị trí</option>
+  </select>
+
+  <div id="form2c" class="block" style="display:none;">
+    <h3>1️⃣ Tính 2C</h3>
+    <label>Góc 1 (DMS):</label>
+    <input id="g1d" placeholder="Độ">
+    <input id="g1m" placeholder="Phút">
+    <input id="g1s" placeholder="Giây">
+    <label>Góc 2 (DMS):</label>
+    <input id="g2d" placeholder="Độ">
+    <input id="g2m" placeholder="Phút">
+    <input id="g2s" placeholder="Giây">
+    <button onclick="tinh2C()">Tính 2C</button>
+    <div id="kq2c" class="result"></div>
+    <div class="note"><b>Công thức:</b> 2C = [A1 + (A2 - 180°)] / 2</div>
+  </div>
+
+  <div id="formkc" class="block" style="display:none;">
+    <h3>2️⃣ Tính khoảng cách 2 điểm</h3>
+    <label>X1:</label>
+    <input id="x1">
+    <label>Y1:</label>
+    <input id="y1">
+    <label>X2:</label>
+    <input id="x2">
+    <label>Y2:</label>
+    <input id="y2">
+    <button onclick="tinhKC()">Tính khoảng cách</button>
+    <div id="kqkc" class="result"></div>
+    <div class="note"><b>Công thức:</b> S = √[(X2 − X1)² + (Y2 − Y1)²]</div>
+  </div>
+
+  <div id="formss" class="block" style="display:none;">
+    <h3>3️⃣ Tính sai số vị trí</h3>
+    <label>∆X:</label>
+    <input id="dx">
+    <label>∆Y:</label>
+    <input id="dy">
+    <button onclick="tinhSaiSo()">Tính sai số vị trí</button>
+    <div id="kqss" class="result"></div>
+    <div class="note"><b>Công thức:</b> m = √[(∆X)² + (∆Y)²]</div>
+  </div>
+
+  <script>
+    function chonChucNang() {
+      var chucnang = document.getElementById("chucnang").value;
+      document.getElementById("form2c").style.display = "none";
+      document.getElementById("formkc").style.display = "none";
+      document.getElementById("formss").style.display = "none";
+      if (chucnang === "2c") document.getElementById("form2c").style.display = "block";
+      else if (chucnang === "kc") document.getElementById("formkc").style.display = "block";
+      else if (chucnang === "ss") document.getElementById("formss").style.display = "block";
+    }
+
+    function dmsToDecimal(d, m, s) {
+      return Math.abs(d) + m / 60 + s / 3600;
+    }
+
+    function tinh2C() {
+      let g1 = dmsToDecimal(
+        parseFloat(document.getElementById("g1d").value) || 0,
+        parseFloat(document.getElementById("g1m").value) || 0,
+        parseFloat(document.getElementById("g1s").value) || 0
+      );
+      let g2 = dmsToDecimal(
+        parseFloat(document.getElementById("g2d").value) || 0,
+        parseFloat(document.getElementById("g2m").value) || 0,
+        parseFloat(document.getElementById("g2s").value) || 0
+      );
+
+      let resultDec = ((g1 + (g2 - 180)) / 2);
+
+      let d = Math.floor(resultDec);
+      let mFloat = (resultDec - d) * 60;
+      let m = Math.floor(mFloat);
+      let s = ((mFloat - m) * 60).toFixed(2);
+
+      document.getElementById("kq2c").innerText = `Kết quả 2C: ${d}° ${m}' ${s}"`;
+    }
+
+    function tinhKC() {
+      let x1 = parseFloat(document.getElementById("x1").value) || 0;
+      let y1 = parseFloat(document.getElementById("y1").value) || 0;
+      let x2 = parseFloat(document.getElementById("x2").value) || 0;
+      let y2 = parseFloat(document.getElementById("y2").value) || 0;
+      let kc = Math.sqrt((x2 - x1)**2 + (y2 - y1)**2).toFixed(3);
+      document.getElementById("kqkc").innerText = `Khoảng cách: ${kc} m`;
+    }
+
+    function tinhSaiSo() {
+      let dx = parseFloat(document.getElementById("dx").value) || 0;
+      let dy = parseFloat(document.getElementById("dy").value) || 0;
+      let ss = Math.sqrt(dx**2 + dy**2).toFixed(3);
+      document.getElementById("kqss").innerText = `Sai số vị trí: ${ss}`;
+    }
+  </script>
+
+</body>
+</html>
